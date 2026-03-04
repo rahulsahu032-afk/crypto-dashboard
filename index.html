@@ -38,8 +38,12 @@ button{padding:8px 15px;margin:5px;background:#2563eb;border:none;color:white;cu
 
 <script>
 async function loadData(order){
-const response=await fetch("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usdt&order=market_cap_desc&per_page=250&page=1");
-const data=await response.json();
+
+const proxy = "https://api.allorigins.win/raw?url=";
+const apiURL = encodeURIComponent("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usdt&order=market_cap_desc&per_page=250&page=1");
+
+const response = await fetch(proxy + apiURL);
+const data = await response.json();
 
 data.sort((a,b)=>order==="desc"
 ?b.price_change_percentage_24h-a.price_change_percentage_24h
