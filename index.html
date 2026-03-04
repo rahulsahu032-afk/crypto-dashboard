@@ -50,11 +50,12 @@ button,select{
 
 <div class="controls">
 
-<select id="broker" onchange="loadData('desc')">
+<select id="broker">
 <option value="binance">Binance</option>
 <option value="coindcx">CoinDCX</option>
 </select>
 
+<button onclick="applyBroker()">Apply</button>
 <button onclick="loadData('desc')">Top Gainers</button>
 <button onclick="loadData('asc')">Top Losers</button>
 
@@ -76,6 +77,10 @@ button,select{
 
 let globalData = [];
 let currentOrder = "desc";
+
+function applyBroker(){
+    loadData(currentOrder);
+}
 
 async function loadData(order){
 
@@ -125,6 +130,7 @@ renderTable();
 
 } catch(error){
     console.log("Error:", error);
+    alert("API blocked or failed. Check console.");
 }
 
 }
@@ -156,7 +162,10 @@ table.appendChild(row);
 });
 }
 
+// initial load
 loadData("desc");
+
+// auto refresh
 setInterval(()=>loadData(currentOrder),60000);
 
 </script>
