@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Crypto Scanner</title>
+<title>CoinDCX Futures Scanner</title>
 <style>
 body{background:#0f172a;color:white;font-family:Arial;padding:20px}
 h1{text-align:center}
@@ -16,7 +16,7 @@ button{padding:8px 15px;margin:5px;background:#2563eb;border:none;color:white;cu
 </head>
 <body>
 
-<h1>Crypto Trend Dashboard</h1>
+<h1>CoinDCX USDT Futures Dashboard</h1>
 
 <div style="text-align:center;">
 <button onclick="loadData('desc')">Top Gainers</button>
@@ -29,6 +29,7 @@ button{padding:8px 15px;margin:5px;background:#2563eb;border:none;color:white;cu
 <th>Rank</th>
 <th>Pair</th>
 <th>24h %</th>
+<th>Last Price</th>
 <th>Volume</th>
 </tr>
 </thead>
@@ -38,34 +39,38 @@ button{padding:8px 15px;margin:5px;background:#2563eb;border:none;color:white;cu
 <script>
 async function loadData(order){
 
-const response = await fetch("https://api.binance.com/api/v3/ticker/24hr");
+const response = await fetch("https://public.coindcx.com/market_data/ticker");
 const data = await response.json();
 
-// filter only USDT pairs
-const usdtPairs = data.filter(c => c.symbol.endsWith("USDT"));
+// filter only USDT perpetual futures
+const futuresPairs = data.filter(c =>
+c.market.includes("USDT") &&
+c.market.includes("PERP")
+);
 
 // sort
-usdtPairs.sort((a,b)=>order==="desc"
-?parseFloat(b.priceChangePercent)-parseFloat(a.priceChangePercent)
-:parseFloat(a.priceChangePercent)-parseFloat(b.priceChangePercent));
+futuresPairs.sort((a,b)=>order==="desc"
+?parseFloat(b.change_24_hour)-parseFloat(a.change_24_hour)
+:parseFloat(a.change_24_hour)-parseFloat(b.change_24_hour));
 
 const table=document.getElementById("cryptoTable");
 table.innerHTML="";
 
-usdtPairs.slice(0,100).forEach((coin,index)=>{
+futuresPairs.slice(0,100).forEach((coin,index)=>{
 const row=document.createElement("tr");
 
 row.onclick=()=>{
-window.open("https://www.tradingview.com/chart/?symbol=BINANCE:"+coin.symbol,"_blank");
+window.open("https://www.tradingview.com/chart/?symbol=COINDCX:"+coin.market,"_blank");
 };
 
 row.innerHTML=`
 <td>${index+1}</td>
-<td>${coin.symbol}</td>
-<td class="${parseFloat(coin.priceChangePercent)>=0?'green':'red'}">
-${parseFloat(coin.priceChangePercent).toFixed(2)}%
+<td>${coin.market}</td>
+<td class="${parseFloat(coin.change_24_hour)>=0?'green':'red'}">
+${parseFloat(coin.change_24_hour).toFixed(2)}%
 </td>
-<td>${parseFloat(coin.quoteVolume).toLocaleString()}</td>
+<td>${coin.last_price}</td>
+<td>${parseFloat(coin.volume).toLocaleString()}</td>
 `;
 
 table.appendChild(row);
